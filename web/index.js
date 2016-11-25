@@ -1,45 +1,46 @@
-var cosas = function(fila)
-{
-    var str="";
-
-    //str+="<div align=\"center\" onClick=\"borrar("+JSON.stringify(fila)+")\">";
-    //str+="algo:"+JSON.stringify(fila);
-    //str+="</div>";
-
-    return str;
-};
 
 var obtenerTabla = function ()
 {
-    var dtsi = function (datos)
-    {
 
-    };
-    var dtno = function ()
-    {
-        alert("no se pudo recuperar datos");
-    };
-
-
-    $("#tata").DataTable(
+    var table = $( "#tata" ).DataTable(
         {
+
+            columnDefs: [ {
+                    targets: -1 ,
+                    data: null ,
+                    defaultContent: "<button class='uno'>Borrar</button> <button class='dos'>NoBorrar</button>"
+                } ] ,
             ajax:
-            {
-                url : "GetSemestres",
-                type : "GET",
-                contentType: "application/json",
-                dataSrc: function (js)
                 {
-                    return $.parseJSON(js.msg);
-                }
-            },
+                    url: "GetSemestres" ,
+                    type: "GET" ,
+                    contentType: "application/json" ,
+                    dataSrc: function ( js )
+                    {
+                        return $.parseJSON( js.msg );
+                    }
+                } ,
             columns:
                 [
-                { data : "idsemestre" },
-                { data : "nomSemestre" },
-                { data : cosas }
+                    { data: "idsemestre" } ,
+                    { data: "nomSemestre" } ,
+                    { data : "<button>Borrar</button>"}
                 ]
-        });
+        } );
+
+    $( '#tata tbody' ).on( 'click' , 'button.uno' , function ()
+    {
+
+        var data = table.row( $(this).parents('tr') ).data();
+        alert("Borrar "+JSON.stringify(data));
+    } );
+    $( '#tata tbody' ).on( 'click' , 'button.dos' , function ()
+    {
+
+        var data = table.row( $(this).parents('tr') ).data();
+        alert("No borrar "+JSON.stringify(data));
+    } );
+
 
 };
 
@@ -67,7 +68,8 @@ var main = function ()
 
     var hecho = function ( datos )
     {
-        $("#tata").dataTable().api().ajax.reload();
+        $.glowl("hecho");
+        $( "#tata" ).dataTable().api().ajax.reload();
     };
     var nohecho = function ()
     {
@@ -78,17 +80,11 @@ var main = function ()
     {
         var ese = $in.val();
 
-/*
-        $.post( "/NewSemestre" , { s: ese } , function ()
-        {
-            alert( "listo" );
-        } );
-*/
         $.ajax(
             {
                 type: "POST" ,
                 url: "/prueba1/NewSemestre" ,
-                data: { s: ese } ,
+                data: JSON.stringify( { s: ese } ) ,
                 dataType: "json"
             } ).done( hecho ).fail( nohecho );
     } );
@@ -99,4 +95,3 @@ var main = function ()
 };
 
 $( document ).ready( main );
-
